@@ -1,0 +1,6 @@
+name = Custom Image Style Path
+description = Applies image style and creates derivative in new path by using image_style_create_derivative().
+package = Custom 
+core = 7.x
+
+files[] = custom_image_style_path.module

@@ -1,0 +1,53 @@
+<?php
+
+/**
+ * Implements the hook_node_insert./i
+ * Applying the image styles and store it in the destination directory.
+ *
+ * @param object $node
+ */
+
+function custom_image_style_path_node_insert($node) {
+  if ($node->type == 'article') {
+
+    // Create thumbnail and resize main image
+    foreach ($node->field_image[$node->language] as $image) {
+
+      $fid = $image['fid'];
+      $file = file_load($fid);
+      $source = $file->uri;
+      $filename = $file->filename;
+
+      $style = image_style_load('image_style_thumb');
+      $destination = "public://" . date("ymd", $node->created) . "/t/" . $filename;
+      image_style_create_derivative($style, $source, $destination);
+
+      $style = image_style_load('image_style_scale');
+      $destination = "public://" . date("ymd", $node->created) . "/_" . $filename;
+      image_style_create_derivative($style, $source, $destination);
+
+      file_unmanaged_delete($source);
+      file_unmanaged_move($destination, $source);
+    } 
+
+    // Resize additional images
+    foreach ($node->field_additional_images[$node->language] as $image) {
+
+      $fid = $image['fid'];
+      $file = file_load($fid);
+      $source = $file->uri;
+      $filename = $file->filename;
+
+      $style = image_style_load('image_style_scale');
+      $destination = "public://" . date("ymd", $node->created) . "/_" . $filename;
+      image_style_create_derivative($style, $source, $destination);
+
+      file_unmanaged_delete($source);
+      file_unmanaged_move($destination, $source);
+    } 
+
+  }
+
+  return;
+}
+
